@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="main.css" media="screen" />
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const apiKey = "l72a4d2993b1a142fda64ebef7e00a5583";
+        const autorization = "bDcyYTRkMjk5M2IxYTE0MmZkYTY0ZWJlZjdlMDBhNTU4Mzo4MjIzNzEzZDVkNzA0MmFjODE1N2I3OTM3Mjg0ZjgxYQ==";
+
+        let URL1 = "https://api.bancopan.com.br";
+        let urltokens = "https://api.bancopan.com.br/consignado/v0/tokens"
+        const headers = {
+            'Access-Control-Allow-Origin':'*',
+            "ApiKey": '${apiKey}',
+            "Authorization": "Basic ${autorization}",
+            "Content-Type": "application/json",
+            'Access-Control-Allow-Methods':'POST,PATCH,OPTIONS'
+
+        };
+        const params = {
+            username: "6594144855_002533",
+            password: "*Parafuso11*",
+            grant_type: "client_credentials+password",
+
+        };
+
+        async function gettoken() {
+
+            try {
+                const response = await fetch(urltokens, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify(params)
+                });
+
+                const data = await response.json();
+                console.log("success:", data);
+            } catch (error) {
+                console.error("Error", error);
+                return data
+            }
+            // return data;
+        }
+        gettoken()
+
+
+        async function simulacao(token, cpf, nascimento) {
+            headers.Authorization = 'Bearer ${token.token}';
+            const simulacao = "/openapi/consignado/v2/emprestimos/simulacao/fgts";
+            const params = {
+                cpf_cliente: cpf,
+                codigo_promotora: "002533",
+                data_nascimento: nascimento
+            };
+            try {
+                const response = await fetch(URL1 + simulacao, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify(params)
+                });
+
+                const data1 = await response.json()
+                console.log("Sucess:", data1);
+            } catch (error) {
+                console.error("Error", error)
+            }
+        }
+
+
+        function submitForm() {
+            const cpf = document.getElementById('cpfInput').value;
+            const nascimento = document.getElementById('nascimentoInput').value;
+
+            gettoken().then(token => simulacao(token, cpf, nascimento));
+        }
+    </script>
+
+    <!-- <script src="/Front/script.js"></script> -->
+
+    <div class="main-class">
+        <div class="princpal-form">
+            <div class="main-title">
+                <h1>Simule o FGTS</h1>
+            </div>
+            <form method="POST" onsubmit="">
+                <div class="campos_cadastro">
+                    <div class="cpf-div">
+                        <span>Cpf(somente número)</span>
+                        <input id="cpfInput" type="text" name="cpf" required="" inputmode=" numeric"
+                            placeholder="000.000.000-00" value="">
+                    </div>
+                    <div class="nascimento-div">
+                        <span>Data de Nascimento</span>
+                        <input id="nascimentoInput" type="text" name="Data" required="" inputmode=" numeric"
+                            placeholder="dd/mm/aaaa" value="">
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <button type="button" onclick="submitForm()">Continua</button>
+                    </div>
+                </div>
+                <!-- <input type="number" name="cpf" required="">
+                <label>Cpf</label> -->
+            </form>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
